@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QIRT-ELISA: Quantum Dot - Integrated Real-Time ELISA - Hormone Monitoring Platform</title>
+    <meta name="description" content="Quantum dot Immunoresonance Technology - ELISA platform for continuous, multiplexed monitoring of insulin, glucagon, and C-peptide">
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            scroll-behavior: smooth;
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .gradient-text {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .card-hover {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        
+        .pulse-animation {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: .7;
+            }
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+            border: 1px solid rgba(102, 126, 234, 0.2);
+        }
+        
+        /* Smooth scroll */
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        /* Animation delays for staggered effects */
+        .delay-100 { animation-delay: 100ms; }
+        .delay-200 { animation-delay: 200ms; }
+        .delay-300 { animation-delay: 300ms; }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .animate-fadeInUp {
+            animation: fadeInUp 0.6s ease-out forwards;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        // Navigation Component
+        const Navigation = () => {
+            const [isScrolled, setIsScrolled] = useState(false);
+
+            useEffect(() => {
+                const handleScroll = () => {
+                    setIsScrolled(window.scrollY > 20);
+                };
+                window.addEventListener('scroll', handleScroll);
+                return () => window.removeEventListener('scroll', handleScroll);
+            }, []);
+
+            return (
+                <nav className={`fixed w-full z-50 transition-all duration-300 ${
+                    isScrolled ? 'bg-white shadow-lg' : 'bg-transparent'
+                }`}>
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                        <div className="flex justify-between items-center h-16">
+                            <div className="flex items-center space-x-2">
+                                <i className="fas fa-microscope text-2xl text-white"></i>
+                                <span className="text-xl font-bold text-white">QIRT-ELISA</span>
+                            </div>
+                            <div className="hidden md:flex space-x-8">
+                                <a href="#overview" className="text-gray-700 hover:text-purple-600 transition">Overview</a>
+                                <a href="#technology" className="text-gray-700 hover:text-purple-600 transition">Technology</a>
+                                <a href="#publications" className="text-gray-700 hover:text-purple-600 transition">Publications</a>
+                                <a href="#code" className="text-gray-700 hover:text-purple-600 transition">Code & Data</a>
+                                <a href="#contact" className="text-gray-700 hover:text-purple-600 transition">Contact</a>
+                            </div>
+                        </div>
+                    </div>
+                </nav>
+            );
+        };
+
+        // Hero Section
+        const Hero = () => {
+            return (
+                <section className="gradient-bg text-white pt-32 pb-20 px-4">
+                    <div className="max-w-7xl mx-auto">
+                        <div className="grid md:grid-cols-2 gap-12 items-center mb-12">
+                            <div className="animate-fadeInUp">
+                                <h1 className="text-5xl md:text-6xl font-bold mb-6 leading-tight">
+                                    Real-Time & Continuous<br/>
+                                    <span className="text-purple-200">Hormone Monitoring</span>
+                                </h1>
+                                <p className="text-xl mb-8 text-purple-100 leading-relaxed">
+                                    Quantum Dot–Integrated Real-Time ELISA (QIRT-ELISA) provides 1-minute temporal resolution for continuous, multiplexed monitoring of insulin, glucagon, and C-peptide, revealing metabolic dynamics invisible to conventional ELISA.
+                                </p>
+                                <div className="flex flex-wrap gap-4">
+                                    <a href="#publications" className="bg-white text-purple-600 px-8 py-3 rounded-lg font-semibold hover:bg-purple-50 transition">
+                                        Read Publications
+                                    </a>
+                                    <a href="#code" className="border-2 border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white hover:text-purple-600 transition">
+                                        Access GitHub
+                                    </a>
+                                </div>
+                            </div>
+                            <div className="animate-fadeInUp delay-200">
+                                <div className="bg-white bg-opacity-10 backdrop-blur-lg rounded-2xl p-4 border border-white border-opacity-20 flex items-center justify-center">
+                                    <img 
+                                        src="16_advs71026_Frontispiece.png" 
+                                        alt="Publication Poster" 
+                                        className="w-full h-auto rounded-lg shadow-lg"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                        <div className="animate-fadeInUp delay-300">
+                            <div className="bg-white bg-opacity-10 backdrop-blur-lg rounded-2xl p-8 border border-white border-opacity-20 max-w-4xl mx-auto">
+                                <h3 className="text-2xl font-bold mb-6">Key Advantages</h3>
+                                <div className="grid md:grid-cols-2 gap-6">
+                                    <div className="flex items-start">
+                                        <i className="fas fa-clock text-2xl mr-4 text-purple-200"></i>
+                                        <div>
+                                            <h4 className="font-semibold mb-1">High Temporal Resolution</h4>
+                                            <p className="text-purple-100 text-sm">1-min QIRT-ELISA vs 15-min conventional ELISA sampling</p>
+                                        </div>
+                                    </div>
+                                    <div className="flex items-start">
+                                        <i className="fas fa-chart-line text-2xl mr-4 text-purple-200"></i>
+                                        <div>
+                                            <h4 className="font-semibold mb-1">Metabolic Time-Series Features</h4>
+                                            <p className="text-purple-100 text-sm">Comprehensive temporal dynamics analysis</p>
+                                        </div>
+                                    </div>
+                                    <div className="flex items-start">
+                                        <i className="fas fa-bullseye text-2xl mr-4 text-purple-200"></i>
+                                        <div>
+                                            <h4 className="font-semibold mb-1">Machine Learning-Based Classification</h4>
+                                            <p className="text-purple-100 text-sm">Early detection of metabolic dysfunction</p>
+                                        </div>
+                                    </div>
+                                    <div className="flex items-start">
+                                        <i className="fas fa-vial text-2xl mr-4 text-purple-200"></i>
+                                        <div>
+                                            <h4 className="font-semibold mb-1">Multiplexed Detection</h4>
+                                            <p className="text-purple-100 text-sm">Simultaneous insulin, glucagon, C-peptide monitoring from whole blood samples</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            );
+        };
+
+        // Interactive Comparison Chart
+        const ComparisonChart = () => {
+            const chartRef = useRef(null);
+            const chartInstance = useRef(null);
+
+            useEffect(() => {
+                if (chartRef.current) {
+                    const ctx = chartRef.current.getContext('2d');
+                    
+                    if (chartInstance.current) {
+                        chartInstance.current.destroy();
+                    }
+
+                    // REAL EXPERIMENTAL DATA
+                    const timeQIRT = [0, 2.5, 5, 7.5, 10, 12.5, 15];
+                    
+                    // Healthy rat (Rat1 - Lean Zucker)
+                    const insulinHealthy = [0.980, 1.056, 1.001, 0.987, 1.069, 1.019, 0.888];
+                    
+                    // Diabetic rat (Rat7 - ZDF Type 2 Diabetes)
+                    const insulinDiabetic = [0.950, 0.813, 0.629, 1.523, 1.081, 0.768, 0.796];
+                    
+                    // Conventional ELISA (only 2 points - start and end)
+                    const timeELISA = [0, 15];
+                    const insulinELISA_Healthy = [1.062, 0.938];  // From actual ELISA measurements
+
+                    chartInstance.current = new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            datasets: [
+                                {
+                                    label: 'Healthy Rat - QIRT-ELISA (7 observations)',
+                                    data: timeQIRT.map((t, i) => ({x: t, y: insulinHealthy[i]})),
+                                    borderColor: '#10b981',
+                                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                                    borderWidth: 3,
+                                    tension: 0.4,
+                                    pointRadius: 6,
+                                    pointHoverRadius: 8,
+                                    fill: true
+                                },
+                                {
+                                    label: 'Diabetic Rat - QIRT-ELISA (7 observations)',
+                                    data: timeQIRT.map((t, i) => ({x: t, y: insulinDiabetic[i]})),
+                                    borderColor: '#ef4444',
+                                    backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                                    borderWidth: 3,
+                                    tension: 0.4,
+                                    pointRadius: 6,
+                                    pointHoverRadius: 8,
+                                    fill: true
+                                },
+                                {
+                                    label: 'Conventional ELISA (2 observations only)',
+                                    data: timeELISA.map((t, i) => ({x: t, y: insulinELISA_Healthy[i]})),
+                                    borderColor: '#6b7280',
+                                    backgroundColor: 'rgba(107, 114, 128, 0.1)',
+                                    borderWidth: 3,
+                                    borderDash: [10, 5],
+                                    pointRadius: 8,
+                                    pointHoverRadius: 10,
+                                    pointStyle: 'rect',
+                                    fill: false
+                                }
+                            ]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    display: true,
+                                    position: 'top',
+                                    labels: {
+                                        font: { size: 13, weight: 'bold' },
+                                        padding: 15,
+                                        usePointStyle: true
+                                    }
+                                },
+                                tooltip: {
+                                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                                    padding: 12,
+                                    titleFont: { size: 14, weight: 'bold' },
+                                    bodyFont: { size: 13 },
+                                    callbacks: {
+                                        label: function(context) {
+                                            let label = context.dataset.label || '';
+                                            if (label) {
+                                                label += ': ';
+                                            }
+                                            label += context.parsed.y.toFixed(3) + ' a.u.';
+                                            return label;
+                                        },
+                                        afterLabel: function(context) {
+                                            const val = context.parsed.y;
+                                            if (val > 1.2) return '⚠️ Dysregulated high';
+                                            if (val < 0.7) return '⚠️ Dysregulated low';
+                                            return '✓ Normal range';
+                                        }
+                                    }
+                                }
+                            },
+                            scales: {
+                                x: {
+                                    type: 'linear',
+                                    title: {
+                                        display: true,
+                                        text: 'Time (minutes)',
+                                        font: { size: 14, weight: 'bold' }
+                                    },
+                                    min: 0,
+                                    max: 15,
+                                    ticks: {
+                                        stepSize: 2.5,
+                                        font: { size: 12 }
+                                    },
+                                    grid: { color: 'rgba(0, 0, 0, 0.05)' }
+                                },
+                                y: {
+                                    title: {
+                                        display: true,
+                                        text: 'Normalized Insulin Signal (a.u.)',
+                                        font: { size: 14, weight: 'bold' }
+                                    },
+                                    min: 0.5,
+                                    max: 1.6,
+                                    ticks: {
+                                        font: { size: 12 }
+                                    },
+                                    grid: { color: 'rgba(0, 0, 0, 0.05)' }
+                                }
+                            }
+                        }
+                    });
+                }
+
+                return () => {
+                    if (chartInstance.current) {
+                        chartInstance.current.destroy();
+                    }
+                };
+            }, []);
+
+            return (
+                <section id="technology" className="py-20 bg-white">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                        <div className="text-center mb-12">
+                            <h2 className="text-4xl font-bold gradient-text mb-4">Temporal Resolution Reveals Metabolic Dysfunction</h2>
+                            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+                                Insulin real data showing how QIRT-ELISA's 1-minute resolution captures both healthy oscillatory patterns and diabetic dysregulationl, invisible to conventional 15-minute ELISA sampling
+                            </p>
+                        </div>
+                        
+                        <div className="bg-gray-50 rounded-2xl p-8 shadow-lg">
+                            <div className="mb-4 bg-gradient-to-r from-blue-50 to-purple-50 border-l-4 border-purple-500 p-4 rounded">
+                                <div className="grid md:grid-cols-2 gap-4 text-sm">
+                                    <div className="flex items-start">
+                                        <span className="text-green-600 font-bold mr-2">●</span>
+                                        <div>
+                                            <strong>Healthy (Lean Zucker):</strong> Shows physiological oscillations (~20% variation) with maintained homeostasis
+                                        </div>
+                                    </div>
+                                    <div className="flex items-start">
+                                        <span className="text-red-600 font-bold mr-2">●</span>
+                                        <div>
+                                            <strong>Diabetic (ZDF Type 2):</strong> Exhibits dramatic dysregulation (~140% variation) with loss of normal pulsatility
+                                        </div>
+                                    </div>
+                                </div>
+                                <p className="text-sm text-gray-600 mt-3">
+                                    <span className="text-gray-500 font-bold mr-2">▬ ▬</span>
+                                    <strong>Conventional ELISA:</strong> Only 2 measurements per 15 minutes misses these diagnostic patterns
+                                </p>
+                            </div>
+                            
+                            <div className="h-96">
+                                <canvas ref={chartRef}></canvas>
+                            </div>
+                            
+                            <div className="mt-8 grid md:grid-cols-3 gap-4">
+                                <div className="bg-green-50 border-l-4 border-green-500 p-4 rounded">
+                                    <div className="text-2xl font-bold text-green-700 mb-1">~20%</div>
+                                    <div className="text-sm text-gray-700">Healthy variation</div>
+                                    <div className="text-xs text-gray-600 mt-1">Physiological oscillations</div>
+                                </div>
+                                <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded">
+                                    <div className="text-2xl font-bold text-red-700 mb-1">~140%</div>
+                                    <div className="text-sm text-gray-700">Diabetic variation</div>
+                                    <div className="text-xs text-gray-600 mt-1">Dysregulated dynamics</div>
+                                </div>
+                                <div className="bg-purple-50 border-l-4 border-purple-500 p-4 rounded">
+                                    <div className="text-2xl font-bold text-purple-700 mb-1">7 vs 2</div>
+                                    <div className="text-sm text-gray-700">Observations</div>
+                                    <div className="text-xs text-gray-600 mt-1">QIRT-ELISA vs ELISA</div>
+                                </div>
+                            </div>
+                            
+                            <div className="mt-6 bg-white rounded-lg p-4 border border-gray-200">
+                                <h4 className="font-bold text-gray-800 mb-2">Key Insights from Temporal Dynamics:</h4>
+                                <div className="grid md:grid-cols-2 gap-4 text-sm text-gray-700">
+                                    <div>
+                                        <strong className="text-green-600">✓ Healthy Pattern:</strong>
+                                        <ul className="ml-4 mt-1 space-y-1">
+                                            <li>• Regular oscillations (5-15 min cycles)</li>
+                                            <li>• Maintained around baseline (±10%)</li>
+                                            <li>• Indicates functional β-cell response</li>
+                                        </ul>
+                                    </div>
+                                    <div>
+                                        <strong className="text-red-600">✗ Diabetic Pattern:</strong>
+                                        <ul className="ml-4 mt-1 space-y-1">
+                                            <li>• Irregular, exaggerated fluctuations</li>
+                                            <li>• Loss of homeostatic control</li>
+                                            <li>• Diagnostic marker for T2D dysfunction</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div className="mt-6 text-center text-xs text-gray-600 border-t pt-4">
+                                <p><strong>Data Source:</strong> Fed-state experiments comparing Rat1 (Lean Zucker - Healthy) vs Rat7 (ZDF - Type 2 Diabetic)</p>
+                                <p>Measurements: Insulin normalized to 15-minute average (F<sub>i</sub>/F<sub>0</sub>). ELISA validation: 216.5 pM (0 min) → 191.1 pM (15 min)</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            );
+        };
+
+        // Key Findings Section
+        const KeyFindings = () => {
+            return (
+                <section className="py-20 bg-gradient-to-br from-purple-50 to-indigo-50">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                        <div className="text-center mb-12">
+                            <h2 className="text-4xl font-bold gradient-text mb-4">Key Scientific Findings</h2>
+                            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+                                New insights into metabolic phenotyping and early diabetes detection
+                            </p>
+                        </div>
+
+                        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+                            <div className="bg-white rounded-xl p-6 shadow-lg card-hover">
+                                <div className="text-4xl font-bold gradient-text mb-2">100%</div>
+                                <div className="text-sm text-gray-500 mb-2">Training Accuracy</div>
+                                <div className="text-2xl font-semibold text-gray-700">88.9%</div>
+                                <div className="text-sm text-gray-500">Cross-Validation</div>
+                            </div>
+                            <div className="bg-white rounded-xl p-6 shadow-lg card-hover">
+                                <div className="text-4xl font-bold gradient-text mb-2">p = 0.004</div>
+                                <div className="text-sm text-gray-500 mb-2">Statistical Significance</div>
+                                <div className="text-2xl font-semibold text-gray-700">4.40</div>
+                                <div className="text-sm text-gray-500">Effect Size (Cohen's d)</div>
+                            </div>
+                            <div className="bg-white rounded-xl p-6 shadow-lg card-hover">
+                                <div className="text-4xl font-bold gradient-text mb-2">15</div>
+                                <div className="text-sm text-gray-500 mb-2">Discriminative Features</div>
+                                <div className="text-2xl font-semibold text-gray-700">184</div>
+                                <div className="text-sm text-gray-500">Total Metrics Extracted</div>
+                            </div>
+                        </div>
+
+                        <div className="grid md:grid-cols-2 gap-8">
+                            <div className="bg-white rounded-2xl p-8 shadow-xl">
+                                <div className="flex items-center mb-6">
+                                    <i className="fas fa-chart-bar text-3xl gradient-text mr-4"></i>
+                                    <h3 className="text-2xl font-bold text-gray-800">Primary Biomarker Discovery</h3>
+                                </div>
+                                <div className="space-y-4">
+                                    <div className="border-l-4 border-purple-500 pl-4">
+                                        <h4 className="font-bold text-lg text-gray-800 mb-2">Glucagon Kinetics (α-Cell Function)</h4>
+                                        <p className="text-gray-600">
+                                            <strong>Glucagon mean rise rate</strong> is the primary discriminator between metabolic phenotypes. Negative values in healthy rats indicate proper glucose-stimulated suppression, while positive values in diabetic rats reveal α-cell dysfunction.
+                                        </p>
+                                    </div>
+                                    <div className="border-l-4 border-indigo-500 pl-4">
+                                        <h4 className="font-bold text-lg text-gray-800 mb-2">Insulin Rise Time (β-Cell Efficiency)</h4>
+                                        <p className="text-gray-600">
+                                            <strong>Insulin mean rise time</strong> reveals β-cell exhaustion patterns. Shortened rise times in T2D indicate compromised secretory capacity during metabolic challenges.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="bg-white rounded-2xl p-8 shadow-xl">
+                                <div className="flex items-center mb-6">
+                                    <i className="fas fa-dna text-3xl gradient-text mr-4"></i>
+                                    <h3 className="text-2xl font-bold text-gray-800">Mechanistic Insights</h3>
+                                </div>
+                                <div className="space-y-4">
+                                    <div className="bg-purple-50 rounded-lg p-4">
+                                        <h4 className="font-bold text-gray-800 mb-2">
+                                            <i className="fas fa-arrow-right text-purple-500 mr-2"></i>
+                                            α-Cell Dysfunction Precedes β-Cell Failure
+                                        </h4>
+                                        <p className="text-gray-600 text-sm">
+                                            QIRT-ELISA reveals that glucagon dysregulation appears in pre-diabetic states before insulin secretion becomes severely compromised.
+                                        </p>
+                                    </div>
+                                    <div className="bg-indigo-50 rounded-lg p-4">
+                                        <h4 className="font-bold text-gray-800 mb-2">
+                                            <i className="fas fa-arrow-right text-indigo-500 mr-2"></i>
+                                            Oscillatory Patterns as Disease Signatures
+                                        </h4>
+                                        <p className="text-gray-600 text-sm">
+                                            Fed-state pulsatile dynamics provide systems-level dysfunction markers invisible to conventional single-timepoint measurements.
+                                        </p>
+                                    </div>
+                                    <div className="bg-blue-50 rounded-lg p-4">
+                                        <h4 className="font-bold text-gray-800 mb-2">
+                                            <i className="fas fa-arrow-right text-blue-500 mr-2"></i>
+                                            Two Features Sufficient for Classification
+                                        </h4>
+                                        <p className="text-gray-600 text-sm">
+                                            Logistic regression with just glucagon mean rise rate and insulin rise time achieves 89% accuracy across phenotypes.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            );
+        };
+
+        // Publications Section
+        const Publications = () => {
+            const publications = [
+                {
+                    title: "A Bead-Based Quantum Dot Immunoassay Integrated with Multi-Module Microfluidics Enables Real-Time Multiplexed Detection of Blood Insulin and Glucagon",
+                    journal: "Advanced Science",
+                    year: "2025",
+                    volume: "12",
+                    issue: "2412185",
+                    authors: "Abouali, H., Srikant, S., Fattah, M.F., Barra, N.G., Chan, D., Ban, D., Schertzer, J.D., Poudineh, M.",
+                    doi: "10.1002/advs.202412185",
+                    link: "https://doi.org/10.1002/advs.202412185",
+                    type: "journal",
+                    icon: "fa-file-alt",
+                    color: "purple",
+                    description: "Published microfluidic platform demonstrating continuous, multiplexed hormone monitoring in GTT experiments with conscious rat models."
+                },
+                {
+                    title: "Decoding Type 2 Diabetes Progression via Metabolic Hormone Time-Series",
+                    journal: "39th Conference on Neural Information Processing Systems (NeurIPS 2025) Workshop: Learning from Time Series for Health.",
+                    year: "2025",
+                    authors: "Abouali, H. et al.",
+                    type: "workshop",
+                    icon: "fa-users",
+                    color: "indigo",
+                    description: "Machine learning classification of diabetes phenotypes using 184 temporal features from QIRT-ELISA fed-state measurements. Achieved 89% cross-validation accuracy with interpretable dynamic biomarkers."
+                }
+            ];
+
+            return (
+                <section id="publications" className="py-20 bg-white">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                        <div className="text-center mb-12">
+                            <h2 className="text-4xl font-bold gradient-text mb-4">Publications</h2>
+                            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+                                Peer-reviewed research and workshop presentations
+                            </p>
+                        </div>
+
+                        <div className="space-y-6">
+                            {publications.map((pub, idx) => (
+                                <div key={idx} className="bg-gradient-to-r from-gray-50 to-white rounded-2xl p-8 shadow-lg card-hover border border-gray-200">
+                                    <div className="flex items-start">
+                                        <div className={`flex-shrink-0 w-16 h-16 bg-${pub.color}-100 rounded-xl flex items-center justify-center mr-6`}>
+                                            <i className={`fas ${pub.icon} text-2xl text-${pub.color}-600`}></i>
+                                        </div>
+                                        <div className="flex-1">
+                                            <div className="flex items-start justify-between mb-3">
+                                                <div>
+                                                    <h3 className="text-2xl font-bold text-gray-800 mb-2">{pub.title}</h3>
+                                                    <p className="text-gray-600 font-medium">
+                                                        {pub.journal} {pub.year}
+                                                        {pub.volume && `, ${pub.volume}`}
+                                                        {pub.issue && ` (${pub.issue})`}
+                                                    </p>
+                                                </div>
+                                                {pub.type === 'journal' && (
+                                                    <span className="bg-purple-100 text-purple-700 px-4 py-1 rounded-full text-sm font-semibold">
+                                                        Published
+                                                    </span>
+                                                )}
+                                                {pub.type === 'workshop' && (
+                                                    <span className="bg-indigo-100 text-indigo-700 px-4 py-1 rounded-full text-sm font-semibold">
+                                                        Workshop
+                                                    </span>
+                                                )}
+                                            </div>
+                                            <p className="text-gray-600 mb-3">{pub.authors}</p>
+                                            <p className="text-gray-700 mb-4">{pub.description}</p>
+                                            {pub.doi && (
+                                                <div className="flex items-center space-x-4">
+                                                    <a 
+                                                        href={pub.link} 
+                                                        target="_blank" 
+                                                        rel="noopener noreferrer"
+                                                        className={`inline-flex items-center bg-${pub.color}-600 text-white px-6 py-2 rounded-lg hover:bg-${pub.color}-700 transition font-semibold`}
+                                                    >
+                                                        <i className="fas fa-external-link-alt mr-2"></i>
+                                                        Read Paper
+                                                    </a>
+                                                    <span className="text-sm text-gray-500">DOI: {pub.doi}</span>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </section>
+            );
+        };
+
+        // Code & Data Section
+        const CodeData = () => {
+            return (
+                <section id="code" className="py-20 bg-gradient-to-br from-gray-900 to-gray-800 text-white">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                        <div className="text-center mb-12">
+                            <h2 className="text-4xl font-bold mb-4">Source Code & Data</h2>
+                            <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+                                Access our code, data, and analysis pipelines
+                            </p>
+                        </div>
+
+                        <div className="grid md:grid-cols-2 gap-8">
+                            <div className="bg-gray-800 bg-opacity-50 backdrop-blur rounded-2xl p-8 border border-gray-700 card-hover">
+                                <div className="flex items-center mb-6">
+                                    <i className="fab fa-github text-4xl mr-4"></i>
+                                    <h3 className="text-2xl font-bold">GitHub Repository</h3>
+                                </div>
+                                <p className="text-gray-300 mb-6">
+                                    Complete analysis pipeline including feature extraction, and machine learning classification for QIRT-ELISA data.
+                                </p>
+                                <div className="space-y-3 mb-6">
+                                    <div className="flex items-center text-gray-300">
+                                        <i className="fas fa-check text-green-400 mr-3"></i>
+                                        <span>184-feature extraction pipeline</span>
+                                    </div>
+                                    <div className="flex items-center text-gray-300">
+                                        <i className="fas fa-check text-green-400 mr-3"></i>
+                                        <span>ML classification models (LR, RF, KNN, SVM)</span>
+                                    </div>
+                                </div>
+                                <a 
+                                    href="https://github.com/hesam-abouali/qirt-elisa-fed-state-analysis" 
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="inline-flex items-center bg-white text-gray-900 px-6 py-3 rounded-lg hover:bg-gray-100 transition font-semibold"
+                                >
+                                    <i className="fab fa-github mr-2"></i>
+                                    View on GitHub
+                                </a>
+                            </div>
+
+                            <div className="bg-gray-800 bg-opacity-50 backdrop-blur rounded-2xl p-8 border border-gray-700 card-hover">
+                                <div className="flex items-center mb-6">
+                                    <i className="fas fa-database text-4xl mr-4"></i>
+                                    <h3 className="text-2xl font-bold">Datasets</h3>
+                                </div>
+                                <p className="text-gray-300 mb-6">
+                                    Anonymized high-resolution time-series data from fed-state and GTT experiments across healthy, pre-diabetic, and diabetic rat models.
+                                </p>
+                                <div className="space-y-3 mb-6">
+                                    <div className="flex items-center text-gray-300">
+                                        <i className="fas fa-check text-green-400 mr-3"></i>
+                                        <span>Fed-state 15-min protocols (2.5-min resolution)</span>
+                                    </div>
+                                    <div className="flex items-center text-gray-300">
+                                        <i className="fas fa-check text-green-400 mr-3"></i>
+                                        <span>GTT 60-min protocols (2.5-min resolution) - COMING VERY SOON!</span>
+                                    </div>
+                                    <div className="flex items-center text-gray-300">
+                                        <i className="fas fa-check text-green-400 mr-3"></i>
+                                        <span>Three phenotypes: Lean, Obese, ZDF rats</span>
+                                    </div>
+                                    <div className="flex items-center text-gray-300">
+                                        <i className="fas fa-check text-green-400 mr-3"></i>
+                                        <span>Comprehensive metabolic metrics CSV</span>
+                                    </div>
+                                </div>
+                                <a 
+                                    href="https://github.com/hesam-abouali/qirt-elisa-fed-state-analysis/tree/main/data" 
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="inline-flex items-center bg-white text-gray-900 px-6 py-3 rounded-lg hover:bg-gray-100 transition font-semibold"
+                                >
+                                    <i className="fas fa-download mr-2"></i>
+                                    Access Data
+                                </a>
+                            </div>
+                        </div>
+
+                        <div className="mt-12 bg-gray-800 bg-opacity-50 backdrop-blur rounded-2xl p-8 border border-gray-700">
+                            <h3 className="text-2xl font-bold mb-4">In Vivo Experimental Protocols</h3>
+                            <div className="grid md:grid-cols-2 gap-6">
+                                <div>
+                                    <h4 className="font-bold text-lg mb-3 flex items-center">
+                                        <i className="fas fa-flask text-purple-400 mr-3"></i>
+                                        Fed-State Protocol
+                                    </h4>
+                                    <ul className="text-gray-300 space-y-2 text-sm">
+                                        <li>• Duration: 15 minutes</li>
+                                        <li>• Sampling: Every 1 minutes (15 timepoints)</li>
+                                        <li>• Animals: Conscious, unrestrained rats</li>
+                                        <li>• Biomarkers: Insulin, glucagon, C-peptide, glucose</li>
+                                        <li>• ELISA validation: Beginning & end timepoints</li>
+                                    </ul>
+                                </div>
+                                <div>
+                                    <h4 className="font-bold text-lg mb-3 flex items-center">
+                                        <i className="fas fa-syringe text-indigo-400 mr-3"></i>
+                                        Glucose Tolerance Test Protocol 
+                                    </h4>
+                                    <ul className="text-gray-300 space-y-2 text-sm">
+                                        <li>• Results COMING VERY SOON!</li>
+                                        <li>• Duration: 60 minutes post-glucose</li>
+                                        <li>• Baseline: 10 minutes pre-intervention</li>
+                                        <li>• Sampling: Every 1 minute (continuous)</li>
+                                        <li>• Biomarkers: Insulin, glucagon, C-peptide, glucose</li>
+                                        <li>• ELISA validation: 0, 15, 30, 45, 60 minutes</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            );
+        };
+
+        // Research Team Section
+        const ResearchTeam = () => {
+            return (
+                <section className="py-20 bg-white">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                        <div className="text-center mb-12">
+                            <h2 className="text-4xl font-bold gradient-text mb-4">Research Team</h2>
+                            <p className="text-xl text-gray-600 max-w-5xl mx-auto">
+                                Collaborative effort across engineering, biomedical sciences, and metabolic research
+                            </p>
+                        </div>
+
+                        <div className="grid md:grid-cols-2 gap-8">
+                            <div className="bg-gradient-to-br from-purple-50 to-indigo-50 rounded-2xl p-8">
+                                <h3 className="text-2xl font-bold mb-6 text-gray-800">
+                                    <i className="fas fa-university text-purple-600 mr-3"></i>
+                                    University of Waterloo
+                                </h3>
+                                <div className="space-y-4">
+                                    <div>
+                                        <p className="font-bold text-gray-800">Mahla Poudineh, Ph.D.</p>
+                                        <p className="text-gray-600 text-sm">Principal Investigator - Microfluidics & Biosensors, Wearable Devices for Health Monitoring</p>
+                                        <p className="text-gray-600 text-sm">Canada Research Chair in Health Monitoring BioNano Devices</p>
+                                    </div>
+                                    <div>
+                                        <p className="font-bold text-gray-800">Hesam Abouali, Ph.D.</p>
+                                        <p className="text-gray-600 text-sm">Postdoctoral Researcher - Microfluidics & Biosensors, Microdevice Engineering & Data Analysis</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl p-8">
+                                <h3 className="text-2xl font-bold mb-6 text-gray-800">
+                                    <i className="fas fa-university text-green-600 mr-3"></i>
+                                    McMaster University
+                                </h3>
+                                <div className="space-y-4">
+                                    <div>
+                                        <p className="font-bold text-gray-800">Jonathan D. Schertzer, Ph.D.</p>
+                                        <p className="text-gray-600 text-sm">Principal Investigator - Metabolic Inflammation</p>
+                                        <p className="text-gray-600 text-sm">Canada Research Chair in Metabolic Inflammation</p>
+                                    </div>
+                                    <div>
+                                        <p className="font-bold text-gray-800">Nicole G. Barra, PhD</p>
+                                        <p className="text-gray-600 text-sm">Research Associate - In Vivo Experimentation, Metabolic Studies</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="mt-8 bg-gray-50 rounded-2xl p-8 border border-gray-200">
+                            <h3 className="text-xl font-bold mb-4 text-gray-800">
+                                <i className="fas fa-hands-helping text-indigo-600 mr-3"></i>
+                                Funding & Support
+                            </h3>
+                            <p className="text-gray-700">
+                                This research is supported by the Canadian Institutes of Health Research (CIHR) and Natural Sciences and Engineering Research Council of Canada (NSERC). We acknowledge support from CMC Microsystems and the Quantum Nano Fabrication and Characterization Facility (QNFCF).
+                            </p>
+                        </div>
+                    </div>
+                </section>
+            );
+        };
+
+        // Contact Section
+        const Contact = () => {
+            return (
+                <section id="contact" className="py-20 gradient-bg text-white">
+                    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                        <h2 className="text-4xl font-bold mb-6">Get in Touch</h2>
+                        <p className="text-xl mb-8 text-purple-100">
+                            Interested in collaboration, accessing our datasets, or implementing QIRT-ELISA?
+                        </p>
+                        
+                        <div className="grid md:grid-cols-2 gap-6 mb-12">
+                            <div className="bg-white bg-opacity-10 backdrop-blur rounded-xl p-6 border border-white border-opacity-20">
+                                <i className="fas fa-building text-3xl mb-4"></i>
+                                <h3 className="text-lg font-bold mb-2">IDEATION Lab</h3>
+                                <p className="text-purple-200 mb-2">
+                                    <a href="https://www.ideation-lab.com/" target="_blank" rel="noopener noreferrer" className="hover:text-white transition underline">
+                                        IDEATION Lab
+                                    </a>
+                                    <br/>
+                                    University of Waterloo
+                                </p>
+                                <p className="text-purple-200 text-sm">
+                                    PI: Mahla Poudineh
+                                </p>
+                            </div>
+                            <div className="bg-white bg-opacity-10 backdrop-blur rounded-xl p-6 border border-white border-opacity-20">
+                                <i className="fas fa-building text-3xl mb-4"></i>
+                                <h3 className="text-lg font-bold mb-2">Schertzer Lab</h3>
+                                <p className="text-purple-200 mb-2">
+                                    <a href="https://www.schertzerlab.com/" target="_blank" rel="noopener noreferrer" className="hover:text-white transition underline">
+                                        Schertzer Lab
+                                    </a>
+                                    <br/>
+                                    McMaster University
+                                </p>
+                                <p className="text-purple-200 text-sm">
+                                    PI: Jonathan Schertzer
+                                </p>
+                            </div>
+                        </div>
+
+                        <div className="flex flex-wrap justify-center gap-4">
+                            <a 
+                                href="https://github.com/hesam-abouali/qirt-elisa-fed-state-analysis" 
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="bg-white text-purple-600 px-6 py-3 rounded-lg font-semibold hover:bg-purple-50 transition inline-flex items-center"
+                            >
+                                <i className="fab fa-github mr-2"></i>
+                                GitHub
+                            </a>
+                            <a 
+                                href="https://www.ideation-lab.com/" 
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="bg-white text-purple-600 px-6 py-3 rounded-lg font-semibold hover:bg-purple-50 transition inline-flex items-center"
+                            >
+                                <i className="fas fa-globe mr-2"></i>
+                                Lab Website
+                            </a>
+                        </div>
+                    </div>
+                </section>
+            );
+        };
+
+        // Footer
+        const Footer = () => {
+            return (
+                <footer className="bg-gray-900 text-gray-400 py-8">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                        <div className="flex flex-col md:flex-row justify-between items-center">
+                            <div className="mb-4 md:mb-0">
+                                <p>&copy; 2025 QIRT-ELISA Research Team. All rights reserved.</p>
+                            </div>
+                            <div className="flex space-x-6">
+                                <a href="#overview" className="hover:text-white transition">Overview</a>
+                                <a href="#technology" className="hover:text-white transition">Technology</a>
+                                <a href="#publications" className="hover:text-white transition">Publications</a>
+                                <a href="#code" className="hover:text-white transition">Code</a>
+                            </div>
+                        </div>
+                    </div>
+                </footer>
+            );
+        };
+
+        // Main App Component
+        const App = () => {
+            return (
+                <div className="min-h-screen">
+                    <Navigation />
+                    <Hero />
+                    <ComparisonChart />
+                    <KeyFindings />
+                    <Publications />
+                    <CodeData />
+                    <ResearchTeam />
+                    <Contact />
+                    <Footer />
+                </div>
+            );
+        };
+
+        // Render the app
+        ReactDOM.render(<App />, document.getElementById('root'));
+    </script>
+</body>
+</html>
